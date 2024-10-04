@@ -1,8 +1,11 @@
 <x-filament-panels::page.simple class="login-page">
+    <h2 style="font-weight: bold; color: #EC6C35; text-align: center; line-height: 1.4; max-width: 300px; margin: 0 auto 1rem auto;">
+        Bienvenid@ ESPUMDESK 
+    </h2>
+    <h3 style="font-weight: bold; color: #EC6C35; text-align: center; line-height: 1.4; max-width: 300px; margin: 0 auto 2rem auto;">
+        Inicie sesión para una<br>asistencia inmediata y eficiente 👌
+    </h3>
     <div class="login-container">
-        {{-- Puedes agregar un título personalizado aquí si lo deseas --}}
-        {{-- <h2>Bienvenido</h2> --}}
-
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE, scopes: $this->getRenderHookScopes()) }}
        
         <x-filament-panels::form wire:submit="authenticate">
@@ -16,8 +19,6 @@
        
         @if (filament()->hasRegistration())
             <div class="mt-4 text-center">
-                {{-- Puedes personalizar o eliminar este mensaje --}}
-                {{-- {{ __('filament-panels::pages/auth/login.actions.register.before') }} --}}
                 {{ $this->registerAction }}
             </div>
         @endif
