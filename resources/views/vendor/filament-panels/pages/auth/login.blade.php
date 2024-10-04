@@ -1,23 +1,27 @@
 <x-filament-panels::page.simple class="login-page">
     <div class="login-container">
+        {{-- Puedes agregar un título personalizado aquí si lo deseas --}}
+        {{-- <h2>Bienvenido</h2> --}}
+
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE, scopes: $this->getRenderHookScopes()) }}
-        
+       
         <x-filament-panels::form wire:submit="authenticate">
             {{ $this->form }}
-            
+           
             <x-filament-panels::form.actions
                 :actions="$this->getCachedFormActions()"
                 :full-width="$this->hasFullWidthFormActions()"
             />
         </x-filament-panels::form>
-        
+       
         @if (filament()->hasRegistration())
             <div class="mt-4 text-center">
-                {{ __('filament-panels::pages/auth/login.actions.register.before') }}
+                {{-- Puedes personalizar o eliminar este mensaje --}}
+                {{-- {{ __('filament-panels::pages/auth/login.actions.register.before') }} --}}
                 {{ $this->registerAction }}
             </div>
         @endif
-        
+       
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::AUTH_LOGIN_FORM_AFTER, scopes: $this->getRenderHookScopes()) }}
     </div>
 </x-filament-panels::page.simple>
