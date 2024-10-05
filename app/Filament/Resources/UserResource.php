@@ -79,6 +79,12 @@ class UserResource extends Resource
                             ])
                             ->required()
                             ->default('activo'),
+                        Forms\Components\Select::make('roles')
+                            ->label('Roles')
+                            ->relationship('roles', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->searchable(),
                     ])
                     ->columns(2),
             ]);
@@ -117,6 +123,10 @@ class UserResource extends Resource
                         'success' => 'activo',
                         'danger' => 'inactivo',
                     ]),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label('Roles')
+                    ->badge()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Creado')
                     ->dateTime()
@@ -134,6 +144,10 @@ class UserResource extends Resource
                         'activo' => 'Activo',
                         'inactivo' => 'Inactivo',
                     ]),
+                Tables\Filters\SelectFilter::make('roles')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
