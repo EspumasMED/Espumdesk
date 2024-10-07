@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Ticket extends Model
 {
@@ -17,53 +16,44 @@ class Ticket extends Model
         'title',
         'description',
         'status',
-        'priority',
-        'sede',
-        'assigned_to',
-        'closed_at',
+        'response',
+        'rating',
+        'file_path',
+        'file_name',
+        'file_type',
     ];
 
     protected $casts = [
-        'closed_at' => 'datetime',
+        'status' => 'string',
+        'rating' => 'integer',
     ];
 
-    public const STATUS = [
-        'abierto' => 'Abierto',
-        'en_progreso' => 'En Progreso',
-        'cerrado' => 'Cerrado',
-        'pendiente' => 'Pendiente',
-    ];
-
-    public const PRIORITY = [
-        'baja' => 'Baja',
-        'media' => 'Media',
-        'alta' => 'Alta',
-        'urgente' => 'Urgente',
-    ];
-
-    public const SEDE = [
-        'Medellin' => 'Medellín',
-        'Barranquilla' => 'Barranquilla',
-        'Ambas' => 'Ambas',
-    ];
-
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function category(): BelongsTo
+    public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function subcategory(): BelongsTo
+    public function subcategory()
     {
         return $this->belongsTo(Subcategory::class);
     }
 
-    public function assignedTo(): BelongsTo
+    public function hasFile()
     {
-        return $this->belongsTo(User::class, 'assigned_to');
+        return !is_null($this->file_path);
     }
+
+    public function respond($response, $rating = null)
+    {
+        $this->response = $response;
+        $this->rating = $rating;
+        $this->status = 'cerrado';
+        $this->save();
+    }
+    
 }

@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\TicketResource;
 use App\Livewire\TotalUsersCard;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -19,7 +20,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-
+use Filament\Navigation\NavigationItem;
 
 class InicioPanelProvider extends PanelProvider
 {
@@ -34,16 +35,16 @@ class InicioPanelProvider extends PanelProvider
                 'primary' => '#EC6C35',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->resources([
+                TicketResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                // Widgets\AccountWidget::class,
                 TotalUsersCard::class,
-
-                
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -59,9 +60,14 @@ class InicioPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            
             ->plugins([
                 FilamentShieldPlugin::make()
+            ])
+            ->navigationItems([
+                NavigationItem::make('Nuevo Ticket')
+                    ->icon('heroicon-o-plus-circle')
+                    ->url(fn (): string => TicketResource::getUrl('create'))
+                    ->sort(11),
             ]);
     }
 }

@@ -6,25 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->foreignId('subcategory_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('category_id')->constrained();
+            $table->foreignId('subcategory_id')->constrained();
             $table->string('title');
             $table->text('description');
-            $table->enum('status', ['abierto', 'en_progreso', 'cerrado', 'pendiente'])->default('abierto');
-            $table->enum('priority', ['baja', 'media', 'alta', 'urgente'])->default('media');
-            $table->enum('sede', ['Medellin', 'Barranquilla', 'Ambas'])->default('Ambas');
-            $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null');
-            $table->timestamp('closed_at')->nullable();
+            $table->enum('status', ['abierto', 'cerrado'])->default('abierto');
+            $table->text('response')->nullable();
+            $table->integer('rating')->nullable();
+            $table->string('file_path')->nullable();
+            $table->string('file_name')->nullable();
+            $table->string('file_type')->nullable();
             $table->timestamps();
         });
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('tickets');
     }
