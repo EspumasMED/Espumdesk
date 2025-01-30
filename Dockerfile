@@ -78,4 +78,4 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev && \
 EXPOSE 2020
 
 # Comando para iniciar la aplicación con Laravel Octane y Swoole
-CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=5008", "--workers=4", "--task-workers=2"]
+CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=2020", "--workers=4", "--task-workers=2"]
