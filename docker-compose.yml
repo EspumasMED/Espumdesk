@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: Espumdesk_app
+    ports:
+      - "2020:2020"  # Puerto de la aplicación
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_TIMEZONE=America/Bogota
+      - DB_HOST=db
+      - DB_PORT=3306  # Puerto interno de MySQL (dentro de la red Docker)
+      - DB_DATABASE=espumdesk
+      - DB_USERNAME=root
+      - DB_PASSWORD=Espumas2025*.
+      - APP_LOCALE=es
+      - APP_FALLBACK_LOCALE=es
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - espumdesk-network
+    volumes:
+      - ./storage:/var/www/html/storage  # Montar el directorio de almacenamiento
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    container_name: espumdesk_db
+    ports:
+      - "2024:3306"  # Puerto interno 3306, expuesto en 3315 en el host
+    environment:
+      - MYSQL_DATABASE=espumdesk
+      - MYSQL_ROOT_PASSWORD=Espumas2025*.
+      - MYSQL_ROOT_HOST=%  # Permitir conexiones desde cualquier host
+    command: --default-authentication-plugin=mysql_native_password  # Usar autenticación nativa
+    volumes:
+      - db-data:/var/lib/mysql  # Persistir datos de la base de datos
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pEspumas2025*."]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - espumdesk-network
+    restart: unless-stopped
+
+networks:
+  bancolombiia-network:
+    driver: bridge
+
+volumes:
+  db-data:  # Volumen para persistir datos de MySQL

@@ -64,10 +64,10 @@ class InicioPanelProvider extends PanelProvider
                 FilamentShieldPlugin::make()
             ])
             ->navigationItems([
-                NavigationItem::make('Nuevo Ticket')
-                    ->icon('heroicon-o-plus-circle')
-                    ->url(fn (): string => TicketResource::getUrl('create'))
-                    ->sort(11),
+                // NavigationItem::make('Nuevo Ticket')
+                //     ->icon('heroicon-o-plus-circle')
+                //     ->url(fn(): string => TicketResource::getUrl('create'))
+                //     ->sort(11),
             ]);
     }
 }

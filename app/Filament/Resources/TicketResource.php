@@ -30,7 +30,7 @@ class TicketResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Hidden::make('user_id')
-                    ->default(fn () => Auth::id()),
+                    ->default(fn() => Auth::id()),
                 Forms\Components\TextInput::make('title')
                     ->label('Título del Ticket')
                     ->required()
@@ -50,7 +50,7 @@ class TicketResource extends Resource
                         }
                         return [];
                     })
-                    ->visible(fn (callable $get) => $get('category_id') !== null),
+                    ->visible(fn(callable $get) => $get('category_id') !== null),
                 Forms\Components\Textarea::make('description')
                     ->label('Descripción')
                     ->required()
@@ -117,12 +117,13 @@ class TicketResource extends Resource
                         }
                         return [];
                     })
-                    ->modalHeading(fn (Ticket $record): string => "Ticket: {$record->title}")
-                    ->modalContent(fn (Ticket $record): View => view(
+                    ->modalHeading(fn(Ticket $record): string => "Ticket: {$record->title}")
+                    ->modalContent(fn(Ticket $record): View => view(
                         'filament.resources.ticket-resource.pages.view-ticket-modal',
                         ['record' => $record]
                     ))
-                    ->modalSubmitActionLabel(fn (Ticket $record): string => 
+                    ->modalSubmitActionLabel(
+                        fn(Ticket $record): string =>
                         $record->status === 'abierto' ? 'Responder y Cerrar' : 'Cerrar'
                     )
                     ->modalWidth('7xl')
@@ -131,7 +132,7 @@ class TicketResource extends Resource
                             $record->response = $data['new_response'];
                             $record->status = 'cerrado';
                             $record->save();
-                            
+
                             Notification::make()
                                 ->title('Respuesta enviada y ticket cerrado')
                                 ->success()
@@ -169,10 +170,11 @@ class TicketResource extends Resource
                 ->icon('heroicon-o-ticket')
                 ->url(static::getUrl('index'))
                 ->sort(10),
-            NavigationItem::make('Nuevo Ticket')
-                ->icon('heroicon-o-plus-circle')
-                ->url(static::getUrl('create'))
-                ->sort(11),
+            // NavigationItem::make('Nuevo Ticket')
+            //     ->icon('heroicon-o-plus-circle')
+            //     ->url(static::getUrl('create'))
+            //     ->sort(11),
         ];
     }
 }
+// DESCOMENTAR EL NAVIGATION ITEM PARA QUE APARESCA EN EL MENU NUEVO TICKET 
