@@ -51,7 +51,7 @@ services:
     restart: unless-stopped
 
 networks:
-  bancolombiia-network:
+  espumdesk-network:
     driver: bridge
 
 volumes:
