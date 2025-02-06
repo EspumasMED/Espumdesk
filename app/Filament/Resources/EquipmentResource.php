@@ -13,6 +13,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Support\Enums\FontWeight;
 use Illuminate\Support\Carbon;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+
 
 class EquipmentResource extends Resource
 {
@@ -251,6 +253,7 @@ class EquipmentResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make()
                 ]),
             ])
             ->emptyStateActions([

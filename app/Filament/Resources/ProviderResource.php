@@ -10,6 +10,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Support\Enums\FontWeight;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+
 
 class ProviderResource extends Resource
 {
@@ -132,6 +134,7 @@ class ProviderResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make()
                 ]),
             ]);
     }

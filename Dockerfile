@@ -74,7 +74,7 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev && \
     chmod -R 775 storage bootstrap/cache && \
     php artisan key:generate --force
 
-# Exponer el puerto 5008 (o el puerto que necesites)
+# Exponer el puerto 2020 (o el puerto que necesites)
 EXPOSE 2020
 
 # Comando para iniciar la aplicación con Laravel Octane y Swoole
