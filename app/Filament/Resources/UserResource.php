@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class UserResource extends Resource
 {
@@ -42,9 +43,9 @@ class UserResource extends Resource
                         Forms\Components\TextInput::make('password')
                             ->label('Contraseña')
                             ->password()
-                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                            ->dehydrated(fn ($state) => filled($state))
-                            ->required(fn (string $context): bool => $context === 'create')
+                            ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                            ->dehydrated(fn($state) => filled($state))
+                            ->required(fn(string $context): bool => $context === 'create')
                             ->rule(Password::defaults())
                             ->autocomplete('new-password')
                             ->same('passwordConfirmation')
@@ -52,7 +53,7 @@ class UserResource extends Resource
                         Forms\Components\TextInput::make('passwordConfirmation')
                             ->label('Confirmar Contraseña')
                             ->password()
-                            ->required(fn (string $context): bool => $context === 'create')
+                            ->required(fn(string $context): bool => $context === 'create')
                             ->dehydrated(false),
                         Forms\Components\TextInput::make('area')
                             ->label('Área')
@@ -157,6 +158,7 @@ class UserResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()->label('Eliminar'),
+                    ExportBulkAction::make()
                 ]),
             ]);
     }
