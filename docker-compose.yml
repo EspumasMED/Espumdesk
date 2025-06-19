@@ -1,58 +1,57 @@
 version: '3.8'
 
 services:
-  app:
+  espumdesk_app:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: Espumdesk_app
-    ports:
-      - "2020:2020"  # Puerto de la aplicación
+      dockerfile: .deploy/Dockerfile
+    container_name: espumdesk_app
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
-      - APP_TIMEZONE=America/Bogota
-      - DB_HOST=db
-      - DB_PORT=3306  # Puerto interno de MySQL (dentro de la red Docker)
-      - DB_DATABASE=espumdesk
-      - DB_USERNAME=root
-      - DB_PASSWORD=Espumas2025*.
-      - APP_LOCALE=es
-      - APP_FALLBACK_LOCALE=es
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - espumdesk-network
+      APP_ENV: ${APP_ENV}
+      APP_KEY: ${APP_KEY}
+      APP_DEBUG: ${APP_DEBUG}
+      APP_URL: ${APP_URL}
     volumes:
-      - ./storage:/var/www/html/storage  # Montar el directorio de almacenamiento
-    restart: unless-stopped
+      - .:/var/www/html
+      - espumdesk-public:/var/www/html/public     # ✅ Volumen dedicado y externo
+    ports:
+      - "${APP_EXTERNAL_PORT}:${APP_PORT}"
+    depends_on:
+      - espumdesk_db
+      - espumdesk_redis
+    networks:
+      - proxy_net
 
-  db:
+  espumdesk_db:
     image: mysql:8.0
     container_name: espumdesk_db
     ports:
-      - "2024:3306"  # Puerto interno 3306, expuesto en 3315 en el host
+      - "${DB_EXTERNAL_PORT}:3306"
     environment:
-      - MYSQL_DATABASE=espumdesk
-      - MYSQL_ROOT_PASSWORD=Espumas2025*.
-      - MYSQL_ROOT_HOST=%  # Permitir conexiones desde cualquier host
-    command: --default-authentication-plugin=mysql_native_password  # Usar autenticación nativa
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST}
     volumes:
-      - db-data:/var/lib/mysql  # Persistir datos de la base de datos
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pEspumas2025*."]
-      interval: 20s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
+      - espumdesk_db_data:/var/lib/mysql
     networks:
-      - espumdesk-network
-    restart: unless-stopped
+      - proxy_net
+
+  espumdesk_redis:
+    image: redis:7-alpine
+    container_name: espumdesk_redis
+    ports:
+      - "${REDIS_EXTERNAL_PORT}:6379"
+    networks:
+      - proxy_net
 
 networks:
-  espumdesk-network:
-    driver: bridge
+  proxy_net:
+    external: true
 
 volumes:
-  db-data:  # Volumen para persistir datos de MySQL
+  espumdesk_db_data:
+  espumdesk-public:
+    external: true
+    name: espumdesk-public

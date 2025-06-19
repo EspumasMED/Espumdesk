@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Equipment extends Model
 {
@@ -15,7 +16,6 @@ class Equipment extends Model
      *
      * @var array
      */
-
     protected $fillable = [
         'company',
         'name',
@@ -27,9 +27,12 @@ class Equipment extends Model
         'assigned_to',
         'area',
         'delivery_record',
-        'notes'
+        'notes',
+        'disco',
+        'procesador',
+        'ram',
+        'otros'
     ];
-
 
     // Constantes para los estados
     const STATUS_AVAILABLE = 'available';
@@ -62,5 +65,22 @@ class Equipment extends Model
     public function provider(): BelongsTo
     {
         return $this->belongsTo(Provider::class);
+    }
+
+    public function perifericos(): HasMany
+    {
+        return $this->hasMany(Periferico::class);
+    }
+    public function caracteristicasMantenimiento(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(CaracteristicasMantenimiento::class);
+    }
+    public function seguimientosPreventivos(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SeguimientoMantenimientoPreventivo::class);
+    }
+    public function seguimientosCorrectivos(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SeguimientoMantenimientoCorrectivo::class);
     }
 }

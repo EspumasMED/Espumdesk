@@ -30,6 +30,13 @@ return new class extends Migration {
             $table->string('area')->nullable();
             $table->string('delivery_record')->nullable()->comment('Ruta del documento del acta de entrega');
             $table->text('notes')->nullable();
+
+            $table->string('disco')->nullable()->comment('Información del disco duro');
+            $table->string('procesador')->nullable()->comment('Información del procesador');
+            $table->string('otros')->nullable()->comment('Otros detalles del equipo');
+            $table->string('ram')->nullable()->comment('Información de la ram');
+
+
             $table->timestamps();
         });
     }

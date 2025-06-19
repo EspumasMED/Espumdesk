@@ -12,15 +12,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Support\Enums\FontWeight;
-use Illuminate\Support\Carbon;
+use Illuminate\Contracts\View\View;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
+use Filament\Tables\Actions\Action;
 
 class EquipmentResource extends Resource
 {
     protected static ?string $model = Equipment::class;
 
-    // Personalización de la navegación
     protected static ?string $navigationIcon = 'heroicon-o-computer-desktop';
     protected static ?string $navigationLabel = 'Equipos';
     protected static ?string $modelLabel = 'Equipo';
@@ -48,7 +48,7 @@ class EquipmentResource extends Resource
                                 Forms\Components\TextInput::make('company_name')
                                     ->required()
                                     ->maxLength(255)
-                                    ->label('Nombre de la Empresa'),
+                                    ->label('Empresa'),
                                 Forms\Components\TextInput::make('email')
                                     ->email()
                                     ->required()
@@ -99,7 +99,7 @@ class EquipmentResource extends Resource
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
-                            ->label('Número de Serie'),
+                            ->label('Numero de Serie'),
 
                         Forms\Components\TextInput::make('brand')
                             ->required()
@@ -123,8 +123,31 @@ class EquipmentResource extends Resource
                         Forms\Components\TextInput::make('area')
                             ->maxLength(255)
                             ->nullable()
-                            ->label('Área/Departamento asignado'),
+                            ->label('Area-Departamento'),
                     ])->columns(3),
+
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\TextInput::make('disco')
+                            ->maxLength(255)
+                            ->nullable()
+                            ->label('Disco'),
+
+                        Forms\Components\TextInput::make('procesador')
+                            ->maxLength(255)
+                            ->nullable()
+                            ->label('Procesador'),
+
+                        Forms\Components\TextInput::make('ram')
+                            ->maxLength(255)
+                            ->nullable()
+                            ->label('RAM'),
+
+                        Forms\Components\TextInput::make('otros')
+                            ->maxLength(255)
+                            ->nullable()
+                            ->label('Otros'),
+                    ])->columns(4),
 
                 Forms\Components\Grid::make()
                     ->schema([
@@ -143,6 +166,125 @@ class EquipmentResource extends Resource
                             ->maxLength(65535)
                             ->label('Notas'),
                     ])->columns(1),
+
+                Forms\Components\Grid::make()
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\Repeater::make('perifericos')
+                            ->label('Periféricos')
+                            ->relationship()
+                            ->schema([
+                                Forms\Components\Select::make('tipo_periferico')
+                                    ->label('Tipo de Periférico')
+                                    ->options([
+                                        'Monitor' => 'Monitor',
+                                        'Teclado' => 'Teclado',
+                                        'Mouse' => 'Mouse',
+                                        'Parlantes' => 'Parlantes',
+                                        'Otros' => 'Otros periféricos',
+                                    ])
+                                    ->reactive()
+                                    ->required(),
+
+                                Forms\Components\TextInput::make('tipo_personalizado')
+                                    ->label('Especificar si es Otro')
+                                    ->visible(fn($get) => $get('tipo_periferico') === 'Otros')
+                                    ->required(fn($get) => $get('tipo_periferico') === 'Otros'),
+
+                                Forms\Components\TextInput::make('marca')
+                                    ->required()
+                                    ->label('Marca'),
+
+                                Forms\Components\TextInput::make('numero_serie')
+                                    ->required()
+                                    ->label('Número de Serie'),
+                            ])
+                            ->columns(4)
+                            ->defaultItems(0)
+                            ->createItemButtonLabel('Agregar periférico')
+                    ]),
+
+                Forms\Components\Grid::make()
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\Fieldset::make('CARACTERÍSTICAS Y ACTIVIDADES DEL MANTENIMIENTO')
+                            ->relationship('caracteristicasMantenimiento')
+                            ->schema([
+                                Forms\Components\TextInput::make('periodicidad')
+                                    ->required()
+                                    ->label('Periodicidad'),
+
+                                Forms\Components\TextInput::make('mantenimiento_fisico')
+                                    ->required()
+                                    ->label('Mantenimiento físico'),
+
+                                Forms\Components\TextInput::make('mantenimiento_software')
+                                    ->required()
+                                    ->label('Mantenimiento al software'),
+                            ])
+                            ->columns(1)
+                    ]),
+
+                Forms\Components\Grid::make()
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\Repeater::make('seguimientosPreventivos')
+                            ->label('Seguimiento Mantenimiento Preventivo')
+                            ->relationship()
+                            ->schema([
+                                Forms\Components\DatePicker::make('fecha_mantenimiento_programado')
+                                    ->label('Fecha de mantenimiento programado')
+                                    ->required(),
+
+                                Forms\Components\DatePicker::make('fecha_realizacion')
+                                    ->label('Fecha de realización'),
+
+                                Forms\Components\TextInput::make('responsable')
+                                    ->required()
+                                    ->label('Responsable del mantenimiento'),
+
+                                Forms\Components\Textarea::make('observaciones')
+                                    ->label('Observaciones y/o recomendaciones')
+                                    ->rows(2),
+                            ])
+                            ->columns(2)
+                            ->defaultItems(0)
+                            ->createItemButtonLabel('Agregar mantenimiento preventivo')
+                    ]),
+
+                Forms\Components\Grid::make()
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\Repeater::make('seguimientosCorrectivos')
+                            ->label('Seguimiento Mantenimiento Correctivo')
+                            ->relationship()
+                            ->schema([
+                                Forms\Components\DatePicker::make('fecha_realizacion')
+                                    ->label('Fecha de realización')
+                                    ->required(),
+
+                                Forms\Components\Textarea::make('servicio_realizado')
+                                    ->label('Servicio técnico realizado')
+                                    ->required()
+                                    ->rows(2),
+
+                                Forms\Components\Textarea::make('repuestos')
+                                    ->label('Repuestos utilizados')
+                                    ->rows(2),
+
+                                Forms\Components\TextInput::make('responsable')
+                                    ->label('Responsable')
+                                    ->required(),
+                            ])
+                            ->columns(2)
+                            ->defaultItems(0)
+                            ->createItemButtonLabel('Agregar mantenimiento correctivo')
+                    ])
+
+
+
+
+
             ]);
     }
 
@@ -170,18 +312,6 @@ class EquipmentResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->label('Modelo'),
-
-                Tables\Columns\TextColumn::make('serial_number')
-                    ->searchable()
-                    ->sortable()
-                    ->label('Número de Serie')
-                    ->toggleable(),
-
-                Tables\Columns\TextColumn::make('brand')
-                    ->searchable()
-                    ->sortable()
-                    ->label('Marca')
-                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
@@ -213,11 +343,6 @@ class EquipmentResource extends Resource
                     ->searchable()
                     ->label('Área')
                     ->toggleable(),
-
-                Tables\Columns\IconColumn::make('delivery_record')
-                    ->boolean()
-                    ->label('Acta')
-                    ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -243,17 +368,27 @@ class EquipmentResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->modalWidth('4xl'),
                 Tables\Actions\DeleteAction::make(),
-                Tables\Actions\Action::make('view_record')
-                    ->icon('heroicon-o-document-text')
-                    ->label('Ver Acta')
-                    ->visible(fn($record) => $record->delivery_record !== null)
-                    ->url(fn($record) => asset('storage/' . $record->delivery_record))
-                    ->openUrlInNewTab(),
+                Tables\Actions\Action::make('hoja_vida')
+                    ->label('Hoja de vida')
+                    ->icon('heroicon-o-eye')
+                    ->modalHeading(fn(Equipment $record): string => "Hoja de vida del equipo: {$record->name}")
+                    ->modalWidth('5xl')
+                    ->modalContent(fn(Equipment $record): View => view('filament.resources.equipment-resource.pages.hoja-vida', [
+                        'equipment' => $record,
+                    ]))
+                    ->modalFooterActions([
+                        Tables\Actions\Action::make('cerrar')
+                            ->label('Cerrar')
+                            ->color('secondary')
+                            ->action(fn() => null),
+                    ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    ExportBulkAction::make()
+                    ExportBulkAction::make()->exports([
+                        ExcelExport::make('Formulario')->fromForm()
+                    ])
                 ]),
             ])
             ->emptyStateActions([
