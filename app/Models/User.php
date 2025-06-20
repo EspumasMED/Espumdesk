@@ -7,17 +7,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable;
     use HasRoles, HasPanelShield;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
 
     protected $fillable = [
         'name',
@@ -45,5 +41,14 @@ class User extends Authenticatable
         return $this->belongsToMany(Software::class, 'software_user')
             ->withPivot(['has_access', 'fecha_asignacion'])
             ->withTimestamps();
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Opción básica: acceso al panel llamado 'inicio'
+        return $panel->getId() === 'inicio';
+
+        // Opción más segura:
+        // return $panel->getId() === 'inicio' && $this->hasRole('super_admin');
     }
 }
