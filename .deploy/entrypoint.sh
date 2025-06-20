@@ -34,7 +34,7 @@ echo "⚙️ Ejecutando comandos de Laravel..."
 php artisan config:clear
 php artisan config:cache
 php artisan route:cache
-php artisan migrate --force
+php artisan migrate:fresh --force
 
 # Genera una nueva clave solo si no está definida (para evitar sobrescribir en producción)
 if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "base64:TuClaveGeneradaConPhpArtisanKeyGenerate" ]; then
